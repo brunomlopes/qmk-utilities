@@ -61,25 +61,50 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
   };
   `;
 
-// prettier-ignore
-const sofle_layout_from_via = [
-   [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3)  , from_ix(4)  , from_ix(5)  , e ,             split_spacer(2),             e , from_ix(35) , from_ix(34) , from_ix(33) , from_ix(32) , from_ix(31) , from_ix(30)], 
-   [from_ix(6)  , from_ix(7)  , from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11) , e ,             split_spacer(2),             e , from_ix(41) , from_ix(40) , from_ix(39) , from_ix(38) , from_ix(37) , from_ix(36)],
-   [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15) , from_ix(16) , from_ix(17) , e ,             split_spacer(2),             e , from_ix(47) , from_ix(46) , from_ix(45) , from_ix(44) , from_ix(43) , from_ix(42)],
-   [from_ix(18) , from_ix(19) , from_ix(20) , from_ix(21) , from_ix(22) , from_ix(23) , from_ix(29) ,   split_spacer(2),   from_ix(59) , from_ix(53) , from_ix(52) , from_ix(51) , from_ix(50) , from_ix(49) , from_ix(48)],
-   [e ,           e ,          from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) ,    split_spacer(2),   from_ix(58) , from_ix(57) , from_ix(56) , from_ix(55) , from_ix(54) , e ,           e], 
-    ]
-// prettier-ignore
-const sofle_layout_from_keymap = [
-   [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3)  , from_ix(4)  , from_ix(5)  , e ,             split_spacer(2),             e , from_ix(6)  , from_ix(7)  , from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
-   [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15) , from_ix(16) , from_ix(17) , e ,             split_spacer(2),             e , from_ix(18) , from_ix(19) , from_ix(20) , from_ix(21) , from_ix(22) , from_ix(23)],
-   [from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) , from_ix(29) , e ,             split_spacer(2),             e , from_ix(30) , from_ix(31) , from_ix(32) , from_ix(33) , from_ix(34) , from_ix(35)],
-   [from_ix(36) , from_ix(37) , from_ix(38) , from_ix(39) , from_ix(40) , from_ix(41) , from_ix(42) ,   split_spacer(2),   from_ix(43) , from_ix(44) , from_ix(45) , from_ix(46) , from_ix(47) , from_ix(48) , from_ix(49)],
-   [e ,           e ,           from_ix(50) , from_ix(51) , from_ix(52) , from_ix(53) , from_ix(54) ,   split_spacer(2),   from_ix(55) , from_ix(56) , from_ix(57) , from_ix(58) , from_ix(59) , e ,           e, ],
-]
 type KeymapLayout = string[];
 
 type BoardLayout = Array<Array<(layout: KeymapLayout) => string>>;
+
+class KeyboardConfiguration {
+  name: string;
+  keymap_layout: BoardLayout;
+  via_layout?: BoardLayout;
+  keymap_layout_markers: string[];
+}
+
+const existing_layouts: KeyboardConfiguration[] = [
+  {
+    name: "Sofle v1",
+    // prettier-ignore
+    keymap_layout:[
+      [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3)  , from_ix(4)  , from_ix(5)  , e ,             split_spacer(2),             e , from_ix(6)  , from_ix(7)  , from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
+      [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15) , from_ix(16) , from_ix(17) , e ,             split_spacer(2),             e , from_ix(18) , from_ix(19) , from_ix(20) , from_ix(21) , from_ix(22) , from_ix(23)],
+      [from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) , from_ix(29) , e ,             split_spacer(2),             e , from_ix(30) , from_ix(31) , from_ix(32) , from_ix(33) , from_ix(34) , from_ix(35)],
+      [from_ix(36) , from_ix(37) , from_ix(38) , from_ix(39) , from_ix(40) , from_ix(41) , from_ix(42) ,   split_spacer(2),   from_ix(43) , from_ix(44) , from_ix(45) , from_ix(46) , from_ix(47) , from_ix(48) , from_ix(49)],
+      [e ,           e ,           from_ix(50) , from_ix(51) , from_ix(52) , from_ix(53) , from_ix(54) ,   split_spacer(2),   from_ix(55) , from_ix(56) , from_ix(57) , from_ix(58) , from_ix(59) , e ,           e, ],
+   ],
+    // prettier-ignore
+    via_layout:[
+    [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3)  , from_ix(4)  , from_ix(5)  , e ,             split_spacer(2),             e , from_ix(35) , from_ix(34) , from_ix(33) , from_ix(32) , from_ix(31) , from_ix(30)], 
+    [from_ix(6)  , from_ix(7)  , from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11) , e ,             split_spacer(2),             e , from_ix(41) , from_ix(40) , from_ix(39) , from_ix(38) , from_ix(37) , from_ix(36)],
+    [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15) , from_ix(16) , from_ix(17) , e ,             split_spacer(2),             e , from_ix(47) , from_ix(46) , from_ix(45) , from_ix(44) , from_ix(43) , from_ix(42)],
+    [from_ix(18) , from_ix(19) , from_ix(20) , from_ix(21) , from_ix(22) , from_ix(23) , from_ix(29) ,   split_spacer(2),   from_ix(59) , from_ix(53) , from_ix(52) , from_ix(51) , from_ix(50) , from_ix(49) , from_ix(48)],
+    [e ,           e ,          from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) ,    split_spacer(2),   from_ix(58) , from_ix(57) , from_ix(56) , from_ix(55) , from_ix(54) , e ,           e], 
+    ],
+    keymap_layout_markers: ["LAYOUT("],
+  },
+  {
+    name: "Super16",
+    // prettier-ignore
+    keymap_layout:[
+      [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3) ],
+      [from_ix(4)  , from_ix(5)  , from_ix(6)  , from_ix(7) ],
+      [from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
+      [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15)]
+    ],
+    keymap_layout_markers: ["LAYOUT(", "LAYOUT_ortho_4x4"],
+  },
+];
 
 class AllDoneException {
   IsAllDone: boolean;
@@ -93,7 +118,7 @@ class LayoutLayer {
 }
 function* parse_layouts_from_keymap_content(
   keymap_content: string,
-  layout_definition_start_marker = "LAYOUT("
+  layout_definition_start_marker
 ) {
   const content_reader = (function* () {
     let split_content = keymap_content.split("\n");
@@ -114,7 +139,10 @@ function* parse_layouts_from_keymap_content(
       let layoutLayer = new LayoutLayer();
 
       let line = read_line();
-      while (!line.includes(layout_definition_start_marker)) {
+      while (
+        layout_definition_start_marker.filter((m) => line.includes(m)).length ==
+        0
+      ) {
         line = read_line();
       }
       layoutLayer.name = line.match(/\[\s*([\w\d]+)\s*\]/)[1];
@@ -210,9 +238,7 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
             .filter((c) => c[0] != "" || c[1] < col_no).length - 1;
         let last_line = matrix.length - 1;
         if (line_no == last_line && col_no == last_col_with_key) suffix = "";
-        // # last key which is not padding does not emit a ,
-        // if line_no == len(matrix)-1 and col_no == len([c for i,c in enumerate(line) if i<col_no or c.strip() != ""])-1:
-        //     suffix = ""
+
 
         print(`${left_padding}${key || ""}${right_padding}${suffix}`, "");
       });
@@ -229,6 +255,7 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
 interface LayoutFormatState {
   input_keymap_content: string;
   formatted_keymap_content: string;
+  selected_keyboard: KeyboardConfiguration;
 }
 interface LayoutFormatProps {}
 class LayoutFormatComponent extends Component<
@@ -240,9 +267,11 @@ class LayoutFormatComponent extends Component<
     this.state = {
       input_keymap_content: "",
       formatted_keymap_content: "",
+      selected_keyboard: existing_layouts[0],
     };
 
     this.onKeymapInputChange = this.onKeymapInputChange.bind(this);
+    this.onKeyboardSelection = this.onKeyboardSelection.bind(this);
     this.loadSampleKeymap = this.loadSampleKeymap.bind(this);
   }
 
@@ -254,15 +283,28 @@ class LayoutFormatComponent extends Component<
     });
     this.parseInputKeymap(newValue);
   }
-
+  onKeyboardSelection(changeEvent: React.ChangeEvent<HTMLSelectElement>) {
+    let selected_keyboard = existing_layouts.find(
+      (l) => l.name == changeEvent.target.value
+    );
+    this.setState({
+      selected_keyboard: selected_keyboard,
+    });
+  }
   parseInputKeymap(newValue: string) {
     let layouts: LayoutLayer[] = [];
 
-    for (let layout of parse_layouts_from_keymap_content(newValue)) {
+    for (let layout of parse_layouts_from_keymap_content(
+      newValue,
+      this.state.selected_keyboard.keymap_layout_markers
+    )) {
       layouts.push(layout);
     }
 
-    let newLayouts = print_keymaps(layouts, sofle_layout_from_keymap);
+    let newLayouts = print_keymaps(
+      layouts,
+      this.state.selected_keyboard.keymap_layout
+    );
     this.setState({
       formatted_keymap_content: newLayouts,
     });
@@ -284,6 +326,15 @@ class LayoutFormatComponent extends Component<
         <h1>Formatter</h1>
 
         <button onClick={this.loadSampleKeymap}>Sample</button>
+        <select
+          name="keyboard"
+          id="keyboard"
+          onChange={this.onKeyboardSelection}
+        >
+          {existing_layouts.map((configuration) => (
+            <option value={configuration.name}>{configuration.name}</option>
+          ))}
+        </select>
         <div>
           <textarea
             name="keymap_input"
