@@ -102,7 +102,7 @@ const existing_layouts: KeyboardConfiguration[] = [
       [from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
       [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15)]
     ],
-    keymap_layout_markers: ["LAYOUT(", "LAYOUT_ortho_4x4"],
+    keymap_layout_markers: ["LAYOUT(", "LAYOUT_ortho_4x4("],
   },
 ];
 
@@ -114,11 +114,12 @@ class AllDoneException {
 }
 class LayoutLayer {
   name: string;
+  layout_function:string;
   keys: KeymapLayout;
 }
 function* parse_layouts_from_keymap_content(
   keymap_content: string,
-  layout_definition_start_marker
+  layout_definition_start_marker:string[]
 ) {
   const content_reader = (function* () {
     let split_content = keymap_content.split("\n");
@@ -139,9 +140,9 @@ function* parse_layouts_from_keymap_content(
       let layoutLayer = new LayoutLayer();
 
       let line = read_line();
+      let marker = "";
       while (
-        layout_definition_start_marker.filter((m) => line.includes(m)).length ==
-        0
+        !(layoutLayer.layout_function = layout_definition_start_marker.find((m) => line.includes(m)))
       ) {
         line = read_line();
       }
@@ -156,7 +157,8 @@ function* parse_layouts_from_keymap_content(
         .filter((l) => l.trim() != ")")
         .map((l) => l.trim().replace(/\\$/, ""))
         .join("")
-        .split(/[,](?!\w+\))/)
+        // FIXME: this is fubaring the LM(something,other) calls
+        .split(/[,](?!\s*\w+\))/)
         .map((s) => s.trim());
       yield layoutLayer;
     } catch (error) {
@@ -214,7 +216,7 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
         matrix[line_no][col_no] = key_label;
       });
     });
-    print(`${indentation}[${layer.name}] = LAYOUT(`);
+    print(`${indentation}[${layer.name}] = ${layer.layout_function}`);
 
     matrix.forEach((line, line_no) => {
       print(`${indentation}${indentation}`, "");
@@ -249,7 +251,7 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
       });
       print("");
     });
-    print(`${indentation}),`);
+    print(`${indentation}),\n`);
   });
 
   print("};");
