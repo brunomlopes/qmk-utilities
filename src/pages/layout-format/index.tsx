@@ -13,6 +13,42 @@ function split_spacer(n: number) {
 function e(_: string[]) {
   return "";
 }
+/**
+ * creates a keymap layout for a simple, straightforward keyboard.
+ * Same number of columns for every row
+ * @param cols number of columns on the keymap
+ * @param rows number of rows on the keymap
+ * @returns
+ */
+function straight_keymap(cols: number, rows: number): BoardLayout {
+  return Array(rows)
+    .fill(null)
+    .map((_, line_no) =>
+      Array(cols)
+        .fill(null)
+        .map((_, col_no) => from_ix(line_no * cols + col_no))
+    );
+}
+
+function straight_split_keymap(
+  cols: number,
+  rows: number,
+  split_spacer_length: number
+) {
+  let split_column_no = Math.round(cols / 2);
+  return Array(rows)
+    .fill(null)
+    .map((_, line_no) =>
+      Array(cols + 1)
+        .fill(null)
+        .map((_, col_no) => {
+          if (col_no < split_column_no) return from_ix(line_no * cols + col_no);
+          if (col_no > split_column_no)
+            return from_ix(line_no * cols + col_no - 1);
+          else return split_spacer(split_spacer_length);
+        })
+    );
+}
 
 const sample_sofle_keymap = `
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -94,6 +130,18 @@ const existing_layouts: KeyboardConfiguration[] = [
     keymap_layout_markers: ["LAYOUT("],
   },
   {
+    name: "Zodiark", // 14x5
+    // prettier-ignore
+    keymap_layout:straight_keymap(14,5),
+    keymap_layout_markers: ["LAYOUT("],
+  },
+  {
+    name: "Zodiark - Split keymap", // 14x5
+    // prettier-ignore
+    keymap_layout:straight_split_keymap(14,5,8),
+    keymap_layout_markers: ["LAYOUT("],
+  },
+  {
     name: "Super16",
     // prettier-ignore
     keymap_layout:[
@@ -114,12 +162,12 @@ class AllDoneException {
 }
 class LayoutLayer {
   name: string;
-  layout_function:string;
+  layout_function: string;
   keys: KeymapLayout;
 }
 function* parse_layouts_from_keymap_content(
   keymap_content: string,
-  layout_definition_start_marker:string[]
+  layout_definition_start_marker: string[]
 ) {
   const content_reader = (function* () {
     let split_content = keymap_content.split("\n");
@@ -142,7 +190,9 @@ function* parse_layouts_from_keymap_content(
       let line = read_line();
       let marker = "";
       while (
-        !(layoutLayer.layout_function = layout_definition_start_marker.find((m) => line.includes(m)))
+        !(layoutLayer.layout_function = layout_definition_start_marker.find(
+          (m) => line.includes(m)
+        ))
       ) {
         line = read_line();
       }
@@ -211,7 +261,7 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
 
     board_layout.map((line_content, line_no) => {
       line_content.map((col, col_no) => {
-        let key_label = col(layer.keys).trim();
+        let key_label = col(layer.keys);
         key_label = run_replacements(key_label);
         matrix[line_no][col_no] = key_label;
       });
@@ -234,18 +284,17 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
         let left_padding = " ";
         // first column doesn't need padding because there's already whitespace
         // at the start, with the indentation
-        if(col_no == 0) left_padding="";
+        if (col_no == 0) left_padding = "";
 
         let suffix = ",";
         if (!key || key.trim() == "") suffix = " ";
 
         let last_col_with_key =
           line
-            .map((c, i) => [c.trim(), i])
+            .map((c, i) => [(c || "").trim(), i])
             .filter((c) => c[0] != "" || c[1] < col_no).length - 1;
         let last_line = matrix.length - 1;
         if (line_no == last_line && col_no == last_col_with_key) suffix = "";
-
 
         print(`${left_padding}${key || ""}${right_padding}${suffix}`, "");
       });
@@ -288,7 +337,7 @@ class LayoutFormatComponent extends Component<
     this.setState({
       input_keymap_content: newValue,
     });
-    this.parseInputKeymap(newValue);
+    this.parseInputKeymap(newValue, this.state.selected_keyboard);
   }
   onKeyboardSelection(changeEvent: React.ChangeEvent<HTMLSelectElement>) {
     let selected_keyboard = existing_layouts.find(
@@ -297,21 +346,19 @@ class LayoutFormatComponent extends Component<
     this.setState({
       selected_keyboard: selected_keyboard,
     });
+    this.parseInputKeymap(this.state.input_keymap_content, selected_keyboard);
   }
-  parseInputKeymap(newValue: string) {
+  parseInputKeymap(newValue: string, selected_keyboard: KeyboardConfiguration) {
     let layouts: LayoutLayer[] = [];
 
     for (let layout of parse_layouts_from_keymap_content(
       newValue,
-      this.state.selected_keyboard.keymap_layout_markers
+      selected_keyboard.keymap_layout_markers
     )) {
       layouts.push(layout);
     }
 
-    let newLayouts = print_keymaps(
-      layouts,
-      this.state.selected_keyboard.keymap_layout
-    );
+    let newLayouts = print_keymaps(layouts, selected_keyboard.keymap_layout);
     this.setState({
       formatted_keymap_content: newLayouts,
     });
@@ -321,7 +368,7 @@ class LayoutFormatComponent extends Component<
     this.setState({
       input_keymap_content: sample_sofle_keymap,
     });
-    this.parseInputKeymap(sample_sofle_keymap);
+    this.parseInputKeymap(sample_sofle_keymap, this.state.selected_keyboard);
   }
 
   render() {
@@ -330,16 +377,20 @@ class LayoutFormatComponent extends Component<
         <Head>
           <title>Layout formatter</title>
         </Head>
-        <h1>Formatter</h1>
+        <h1>Formats keymap.c layouts</h1>
 
-        <button onClick={this.loadSampleKeymap}>Sample</button>
+        <button onClick={this.loadSampleKeymap}>
+          Load sample sofle keymap
+        </button>
         <select
           name="keyboard"
           id="keyboard"
           onChange={this.onKeyboardSelection}
         >
           {existing_layouts.map((configuration) => (
-            <option value={configuration.name}>{configuration.name}</option>
+            <option value={configuration.name} key={configuration.name}>
+              {configuration.name}
+            </option>
           ))}
         </select>
         <div>
