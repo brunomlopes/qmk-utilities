@@ -181,6 +181,8 @@ function run_replacements(key_label: string) {
   return key_label;
 }
 
+let base_indentation_level = 0;
+let indentation = "  ";
 function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
   let strBuilder = "";
 
@@ -212,10 +214,10 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
         matrix[line_no][col_no] = key_label;
       });
     });
-    print(`[${layer.name}] = LAYOUT(`);
+    print(`${indentation}[${layer.name}] = LAYOUT(`);
 
     matrix.forEach((line, line_no) => {
-      print(" ", "");
+      print(`${indentation}${indentation}`, "");
       line.forEach((key, col_no) => {
         let key_lengths = matrix
           .map((l) => l[col_no])
@@ -228,6 +230,9 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
           longest_key_definition_length - (key || "").length
         );
         let left_padding = " ";
+        // first column doesn't need padding because there's already whitespace
+        // at the start, with the indentation
+        if(col_no == 0) left_padding="";
 
         let suffix = ",";
         if (!key || key.trim() == "") suffix = " ";
@@ -244,7 +249,7 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
       });
       print("");
     });
-    print("),");
+    print(`${indentation}),`);
   });
 
   print("};");
