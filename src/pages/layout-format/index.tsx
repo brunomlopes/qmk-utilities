@@ -101,6 +101,37 @@ type KeymapLayout = string[];
 
 type BoardLayout = Array<Array<(layout: KeymapLayout) => string>>;
 
+let pretty_labels = {
+  KC_EXLM: `!`,
+  KC_HASH: `#`,
+  KC_PERC: `%`,
+  KC_AT: `@`,
+  KC_DLR: `$`,
+  KC_CIRC: `^`,
+  KC_LCBR: `{`,
+  KC_LPRN: `(`,
+  KC_LBRC: `[`,
+  KC_RCBR: `}`,
+  KC_RPRN: `)`,
+  KC_RBRC: `]`,
+  KC_PIPE: `|`,
+  KC_GRV: "` ~",
+  KC_TILD: `~`,
+  KC_PLUS: `+`,
+  KC_AMPR: `&`,
+  KC_UNDS: `_`,
+  KC_MINS: `- _`,
+  KC_EQL: `= +`,
+  "KC_ALGR(KC_5)": `€`,
+  KC_SLSH: `/ ?`,
+  KC_COMM: `, >`,
+  KC_ASTR: `*`,
+  KC_DOT: `. <`,
+  KC_BSLS: `\ |`,
+  KC_QUOT: `' "`,
+  KC_SCLN: `; :`,
+};
+
 class KeyboardConfiguration {
   name: string;
   keymap_layout: BoardLayout;
@@ -138,7 +169,6 @@ const existing_layouts: KeyboardConfiguration[] = [
       [from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) , from_ix(29) , from_ix(30) , from_ix(31) , split_spacer(2),   from_ix(32) , from_ix(33) , from_ix(34) , from_ix(35) , from_ix(36) , from_ix(37) , from_ix(38) , from_ix(39)],
       [e ,           e ,           e ,           from_ix(40) , from_ix(41) , from_ix(42) , from_ix(43) , from_ix(44) , split_spacer(2),   from_ix(45) , from_ix(46) , from_ix(47) , from_ix(48) , from_ix(49) , from_ix(50) , e ,           e],
    ],
-    // prettier-ignore
     keymap_layout_markers: ["LAYOUT(", "LAYOUT_wrapper("],
   },
   {
@@ -151,30 +181,21 @@ const existing_layouts: KeyboardConfiguration[] = [
       [from_ix(36) , from_ix(37) , from_ix(38) , from_ix(39) , from_ix(40) , from_ix(41) , from_ix(42) ,   split_spacer(2),   from_ix(43) , from_ix(44) , from_ix(45) , from_ix(46) , from_ix(47) , from_ix(48) , from_ix(49)],
       [e ,           e ,           e ,           from_ix(50) , from_ix(51) , from_ix(52) , from_ix(53) ,   split_spacer(2),   from_ix(54) , from_ix(55) , from_ix(56) , from_ix(57) , e ,           e ,           e, ],
    ],
-    // prettier-ignore
     keymap_layout_markers: ["LAYOUT(", "LAYOUT_wrapper("],
   },
   {
-    name: "Zodiark", // 14x5
-    // prettier-ignore
-    keymap_layout:straight_keymap(14,5),
+    name: "Zodiark",
+    keymap_layout: straight_keymap(14, 5),
     keymap_layout_markers: ["LAYOUT("],
   },
   {
-    name: "Zodiark - Split keymap", // 14x5
-    // prettier-ignore
-    keymap_layout:straight_split_keymap(14,5,8),
+    name: "Zodiark - Split keymap",
+    keymap_layout: straight_split_keymap(14, 5, 8),
     keymap_layout_markers: ["LAYOUT("],
   },
   {
     name: "Super16",
-    // prettier-ignore
-    keymap_layout:[
-      [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3) ],
-      [from_ix(4)  , from_ix(5)  , from_ix(6)  , from_ix(7) ],
-      [from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
-      [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15)]
-    ],
+    keymap_layout: straight_keymap(4, 4),
     keymap_layout_markers: ["LAYOUT(", "LAYOUT_ortho_4x4("],
   },
 ];
@@ -232,7 +253,6 @@ function* parse_layouts_from_keymap_content(
         .filter((l) => l.trim() != ")")
         .map((l) => l.trim().replace(/\\$/, ""))
         .join("")
-        // FIXME: this is fubaring the LM(something,other) calls
         .split(/[,](?!\s*\w+\))/)
         .map((s) => s.trim());
       yield layoutLayer;
@@ -254,22 +274,26 @@ const sofle_layer_names = [
 ];
 const layer_names = sofle_layer_names;
 
-function run_replacements(key_label: string) {
+function keymap_code_replacements(key_label: string) {
   return key_label;
 }
 
+function pretty_labels_replacements(key_label: string) {
+  if (pretty_labels[key_label]) return pretty_labels[key_label];
+
+  return key_label.replace("KC_", "");
+}
+
+let run_replacements = keymap_code_replacements;
+
 let base_indentation_level = 0;
 let indentation = "  ";
-function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
+function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout, render_header_and_footer: boolean) {
   let strBuilder = "";
 
   function print(s: string, end = "\n") {
     strBuilder += s + end;
   }
-
-  // print("enum layers {");
-  // layer_names.forEach((n) => print(`\t${n},`));
-  // print("};\n\n");
 
   const min_padding = 1;
 
@@ -278,7 +302,8 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
     Math.max(...board_layout.map((line) => line.length)),
   ];
 
-  print("const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {");
+  if(render_header_and_footer)
+    print("const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {");
   layers.forEach((layer, i) => {
     let matrix: string[][] = Array(matrix_shape[0])
       .fill(null)
@@ -327,8 +352,9 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout) {
     });
     print(`${indentation}),\n`);
   });
-
-  print("};");
+  
+  if(render_header_and_footer)
+    print("};");
 
   return strBuilder;
 }
@@ -376,6 +402,11 @@ class LayoutFormatComponent extends Component<
   parseInputKeymap(newValue: string, selected_keyboard: KeyboardConfiguration) {
     let layouts: LayoutLayer[] = [];
 
+    let render_header_and_footer = false;
+
+    if (newValue.toLowerCase().indexOf("progmem")!= -1)
+      render_header_and_footer = true;
+
     for (let layout of parse_layouts_from_keymap_content(
       newValue,
       selected_keyboard.keymap_layout_markers
@@ -383,7 +414,7 @@ class LayoutFormatComponent extends Component<
       layouts.push(layout);
     }
 
-    let newLayouts = print_keymaps(layouts, selected_keyboard.keymap_layout);
+    let newLayouts = print_keymaps(layouts, selected_keyboard.keymap_layout, render_header_and_footer);
     this.setState({
       formatted_keymap_content: newLayouts,
     });
