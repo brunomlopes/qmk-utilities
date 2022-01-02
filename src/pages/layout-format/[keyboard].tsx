@@ -4,6 +4,9 @@ import Layout from "components/layout";
 import styles from "./index.module.css";
 import React, { Component } from "react";
 
+import { useRouter } from "next/router";
+import { debug } from "console";
+
 function from_ix(ix: number) {
   return (layout: string[]) => layout[ix];
 }
@@ -184,6 +187,17 @@ const existing_layouts: KeyboardConfiguration[] = [
     keymap_layout_markers: ["LAYOUT(", "LAYOUT_wrapper("],
   },
   {
+    name: "Reviung41",
+    // prettier-ignore
+    keymap_layout:[
+      [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3)  , from_ix(4)  , from_ix(5)  , split_spacer(2)         , from_ix(6)  , from_ix(7)  , from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
+      [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15) , from_ix(16) , from_ix(17) , split_spacer(2)         , from_ix(18) , from_ix(19) , from_ix(20) , from_ix(21) , from_ix(22) , from_ix(23)],
+      [from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) , from_ix(29) , split_spacer(2)         , from_ix(30) , from_ix(31) , from_ix(32) , from_ix(33) , from_ix(34) , from_ix(35)],
+      [e           , e           , e           , e           , from_ix(36) , from_ix(37) , from_ix(38) , from_ix(39) , from_ix(40) , e           , e            , e          , e]
+   ],
+    keymap_layout_markers: ["LAYOUT(", "LAYOUT_wrapper(", "LAYOUT_reviung41("],
+  },
+  {
     name: "Zodiark",
     keymap_layout: straight_keymap(14, 5),
     keymap_layout_markers: ["LAYOUT("],
@@ -288,7 +302,11 @@ let run_replacements = keymap_code_replacements;
 
 let base_indentation_level = 0;
 let indentation = "  ";
-function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout, render_header_and_footer: boolean) {
+function print_keymaps(
+  layers: LayoutLayer[],
+  board_layout: BoardLayout,
+  render_header_and_footer: boolean
+) {
   let strBuilder = "";
 
   function print(s: string, end = "\n") {
@@ -302,7 +320,7 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout, render_
     Math.max(...board_layout.map((line) => line.length)),
   ];
 
-  if(render_header_and_footer)
+  if (render_header_and_footer)
     print("const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {");
   layers.forEach((layer, i) => {
     let matrix: string[][] = Array(matrix_shape[0])
@@ -352,9 +370,8 @@ function print_keymaps(layers: LayoutLayer[], board_layout: BoardLayout, render_
     });
     print(`${indentation}),\n`);
   });
-  
-  if(render_header_and_footer)
-    print("};");
+
+  if (render_header_and_footer) print("};");
 
   return strBuilder;
 }
@@ -364,17 +381,29 @@ interface LayoutFormatState {
   formatted_keymap_content: string;
   selected_keyboard: KeyboardConfiguration;
 }
-interface LayoutFormatProps {}
+interface LayoutFormatProps {
+  keyboard?: string;
+  pushKeyboard: (keyboardName: string) => void;
+}
 class LayoutFormatComponent extends Component<
   LayoutFormatProps,
   LayoutFormatState
 > {
+  private _pushKeyboard: (keyboardName: string) => void;
   constructor(props: LayoutFormatProps) {
     super(props);
+    let selected_keyboard = existing_layouts[0];
+    if (props.keyboard)
+      selected_keyboard =
+        existing_layouts.find((k) => k.name == props.keyboard) ??
+        existing_layouts[0];
+
+    this._pushKeyboard = props.pushKeyboard;
+
     this.state = {
       input_keymap_content: "",
       formatted_keymap_content: "",
-      selected_keyboard: existing_layouts[0],
+      selected_keyboard: selected_keyboard,
     };
 
     this.onKeymapInputChange = this.onKeymapInputChange.bind(this);
@@ -394,6 +423,7 @@ class LayoutFormatComponent extends Component<
     let selected_keyboard = existing_layouts.find(
       (l) => l.name == changeEvent.target.value
     );
+    this._pushKeyboard(selected_keyboard.name);
     this.setState({
       selected_keyboard: selected_keyboard,
     });
@@ -404,7 +434,7 @@ class LayoutFormatComponent extends Component<
 
     let render_header_and_footer = false;
 
-    if (newValue.toLowerCase().indexOf("progmem")!= -1)
+    if (newValue.toLowerCase().indexOf("progmem") != -1)
       render_header_and_footer = true;
 
     for (let layout of parse_layouts_from_keymap_content(
@@ -414,7 +444,11 @@ class LayoutFormatComponent extends Component<
       layouts.push(layout);
     }
 
-    let newLayouts = print_keymaps(layouts, selected_keyboard.keymap_layout, render_header_and_footer);
+    let newLayouts = print_keymaps(
+      layouts,
+      selected_keyboard.keymap_layout,
+      render_header_and_footer
+    );
     this.setState({
       formatted_keymap_content: newLayouts,
     });
@@ -440,6 +474,7 @@ class LayoutFormatComponent extends Component<
           <select
             name="keyboard"
             id="keyboard"
+            defaultValue={this.state.selected_keyboard.name}
             onChange={this.onKeyboardSelection}
           >
             {existing_layouts.map((configuration) => (
@@ -489,4 +524,27 @@ class LayoutFormatComponent extends Component<
   }
 }
 
-export default LayoutFormatComponent;
+const WrappedLayoutFormatComponent = (params) => {
+  const router = useRouter();
+  const { keyboard } = router.query;
+  let pushKeyboard = (name: string) => {
+    router.push(name, name, { scroll: false, shallow: true });
+  };
+  return (
+    <LayoutFormatComponent
+      keyboard={(keyboard ?? "").toString()}
+      pushKeyboard={pushKeyboard}
+    ></LayoutFormatComponent>
+  );
+};
+
+export default WrappedLayoutFormatComponent;
+
+export async function getServerSideProps(ctx) {
+  const { keyboard } = ctx.query;
+  return {
+    props: {
+      keyboard,
+    },
+  };
+}

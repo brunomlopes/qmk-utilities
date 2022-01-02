@@ -11,7 +11,7 @@ export default function Home() {
       </Head>
       <section className={utilStyles.headingMd}>
         <p>
-          <Link href="/layout-format">
+          <Link href="/layout-format/Sofle">
             <a>Layout format</a>
           </Link>
         </p>
