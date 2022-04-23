@@ -2,6 +2,12 @@ export type KeymapLayout = string[];
 
 export type BoardLayout = Array<Array<(layout: KeymapLayout) => string>>;
 
+export class LayoutLayer {
+  name: string;
+  layout_function: string;
+  keys: KeymapLayout;
+}
+
 function from_ix(ix: number) {
   return (layout: string[]) => layout[ix];
 }
