@@ -13,7 +13,7 @@ import {
   KeymapLayout,
 } from "code/layouts";
 import { LayoutLayer } from "code/layouts";
-import { parse_layouts_from_keymap_content, print_keymaps } from "code/zmk";
+import { parse_layouts_from_keymap_content, print_keymaps_zmk } from "code/zmk";
 
 const sample_reviung_keymap = `
 keymap {
@@ -142,7 +142,7 @@ class LayoutFormatComponent extends Component<
       layouts.push(layout);
     }
 
-    let newLayouts = print_keymaps(
+    let newLayouts = print_keymaps_zmk(
       layouts,
       selected_keyboard.keymap_layout,
       render_header_and_footer

@@ -10,7 +10,7 @@ import {
   KeyboardConfiguration,
   LayoutLayer,
 } from "code/layouts";
-import { parse_layouts_from_keymap_content, print_keymaps } from "code/qmk";
+import { parse_layouts_from_keymap_content, print_keymaps_qmk } from "code/qmk";
 
 const sample_sofle_keymap = `
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -127,7 +127,7 @@ class LayoutFormatComponent extends Component<
       layouts.push(layout);
     }
 
-    let newLayouts = print_keymaps(
+    let newLayouts = print_keymaps_qmk(
       layouts,
       selected_keyboard.keymap_layout,
       render_header_and_footer

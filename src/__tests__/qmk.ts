@@ -1,5 +1,5 @@
 import { existing_layouts } from "code/layouts";
-import { parse_layouts_from_keymap_content, print_keymaps } from "code/qmk";
+import { parse_layouts_from_keymap_content, print_keymaps_qmk } from "code/qmk";
 
 const sofle_layout = existing_layouts.find((l) => l.name == "Sofle");
 
@@ -105,11 +105,18 @@ describe("QMK Render", () => {
         KC_LSFT , KC_Z , KC_X    , KC_C    , KC_V    , KC_B    , KC_MUTE ,    KC_NO  , KC_K    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH , KC_RSFT ,
                         KC_LGUI , KC_LALT , KC_LCTL , _______ , KC_ENT  ,    KC_SPC , _______ , KC_RCTL , KC_RALT , KC_RGUI
     ),
+    [_LOWER] = LAYOUT(
+      KC_DEL  , KC_F1   , KC_F2   , KC_F3   , KC_F4   , KC_F5   ,                        KC_F6       , KC_F7   , KC_F8      , KC_F9   , KC_F10  , KC_F11  ,
+      KC_GRV  , KC_1    , KC_2    , KC_3    , KC_4    , KC_5    ,                        KC_6        , KC_7    , KC_8       , KC_9    , KC_0    , KC_F12  ,
+      KC_TILD , KC_EXLM , KC_AT   , KC_HASH , KC_DLR  , KC_PERC ,                        KC_CIRC     , KC_AMPR , KC_ASTR    , KC_LPRN , KC_RPRN , KC_PIPE ,
+      _______ , KC_UNDS , KC_MINS , KC_NO   , KC_LCBR , KC_LBRC , _______ ,    _______ , KC_NUBS     , KC_RPRN , S(KC_NUBS) , KC_NO   , KC_NO   , _______ ,
+                          _______ , _______ , _______ , _______ , _______ ,    _______ , TT(_NUMPAD) , _______ , _______    , _______
+  ),
     `,
         sofle_layout.keymap_layout_markers
       ),
     ];
-    let rendered_layout = print_keymaps(
+    let rendered_layout = print_keymaps_qmk(
       layouts,
       sofle_layout.keymap_layout,
       false
@@ -120,6 +127,14 @@ describe("QMK Render", () => {
     KC_TAB  , KC_A , KC_R    , KC_S    , KC_T    , KC_D    ,                         KC_H    , KC_N    , KC_E    , KC_I    , KC_O    , KC_QUOT ,
     KC_LSFT , KC_Z , KC_X    , KC_C    , KC_V    , KC_B    , KC_MUTE ,      KC_NO  , KC_K    , KC_M    , KC_COMM , KC_DOT  , KC_SLSH , KC_RSFT ,
                      KC_LGUI , KC_LALT , KC_LCTL , _______ , KC_ENT  ,      KC_SPC , _______ , KC_RCTL , KC_RALT , KC_RGUI                     
+  ),
+
+  [_LOWER] = LAYOUT(
+    KC_DEL  , KC_F1   , KC_F2   , KC_F3   , KC_F4   , KC_F5   ,                          KC_F6       , KC_F7   , KC_F8      , KC_F9   , KC_F10  , KC_F11  ,
+    KC_GRV  , KC_1    , KC_2    , KC_3    , KC_4    , KC_5    ,                          KC_6        , KC_7    , KC_8       , KC_9    , KC_0    , KC_F12  ,
+    KC_TILD , KC_EXLM , KC_AT   , KC_HASH , KC_DLR  , KC_PERC ,                          KC_CIRC     , KC_AMPR , KC_ASTR    , KC_LPRN , KC_RPRN , KC_PIPE ,
+    _______ , KC_UNDS , KC_MINS , KC_NO   , KC_LCBR , KC_LBRC , _______ ,      _______ , KC_NUBS     , KC_RPRN , S(KC_NUBS) , KC_NO   , KC_NO   , _______ ,
+                        _______ , _______ , _______ , _______ , _______ ,      _______ , TT(_NUMPAD) , _______ , _______    , _______                     
   ),
 
 `);

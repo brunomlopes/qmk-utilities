@@ -1,5 +1,5 @@
 import { existing_layouts } from "code/layouts";
-import { parse_layouts_from_keymap_content, print_keymaps } from "code/zmk";
+import { parse_layouts_from_keymap_content, print_keymaps_zmk } from "code/zmk";
 
 let reviung41_layout = existing_layouts.find((l) => l.name == "Reviung41");
 
@@ -104,7 +104,7 @@ describe("ZMK Render", () => {
               `),
     ];
 
-    let rendered_layout = print_keymaps(
+    let rendered_layout = print_keymaps_zmk(
       layouts,
       reviung41_layout.keymap_layout,
       false
