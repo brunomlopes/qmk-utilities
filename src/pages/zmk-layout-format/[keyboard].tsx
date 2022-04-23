@@ -6,52 +6,12 @@ import React, { Component } from "react";
 
 import { useRouter } from "next/router";
 import { debug } from "console";
-
-function from_ix(ix: number) {
-  return (layout: string[]) => layout[ix];
-}
-function split_spacer(n: number) {
-  return (_: string[]) => " ".repeat(n);
-}
-function e(_: string[]) {
-  return "";
-}
-/**
- * creates a keymap layout for a simple, straightforward keyboard.
- * Same number of columns for every row
- * @param cols number of columns on the keymap
- * @param rows number of rows on the keymap
- * @returns
- */
-function straight_keymap(cols: number, rows: number): BoardLayout {
-  return Array(rows)
-    .fill(null)
-    .map((_, line_no) =>
-      Array(cols)
-        .fill(null)
-        .map((_, col_no) => from_ix(line_no * cols + col_no))
-    );
-}
-
-function straight_split_keymap(
-  cols: number,
-  rows: number,
-  split_spacer_length: number
-) {
-  let split_column_no = Math.round(cols / 2);
-  return Array(rows)
-    .fill(null)
-    .map((_, line_no) =>
-      Array(cols + 1)
-        .fill(null)
-        .map((_, col_no) => {
-          if (col_no < split_column_no) return from_ix(line_no * cols + col_no);
-          if (col_no > split_column_no)
-            return from_ix(line_no * cols + col_no - 1);
-          else return split_spacer(split_spacer_length);
-        })
-    );
-}
+import {
+  BoardLayout,
+  existing_layouts,
+  KeyboardConfiguration,
+  KeymapLayout,
+} from "common/layouts";
 
 const sample_reviung_keymap = `
 keymap {
@@ -115,30 +75,7 @@ keymap {
 };
   `;
 
-type KeymapLayout = string[];
-
-type BoardLayout = Array<Array<(layout: KeymapLayout) => string>>;
-
 let pretty_labels = {};
-
-class KeyboardConfiguration {
-  name: string;
-  keymap_layout: BoardLayout;
-  via_layout?: BoardLayout;
-}
-
-const existing_layouts: KeyboardConfiguration[] = [
-  {
-    name: "Reviung41",
-    // prettier-ignore
-    keymap_layout:[
-      [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3)  , from_ix(4)  , from_ix(5)  , split_spacer(2) , from_ix(6)  , from_ix(7)  , from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
-      [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15) , from_ix(16) , from_ix(17) , split_spacer(2) , from_ix(18) , from_ix(19) , from_ix(20) , from_ix(21) , from_ix(22) , from_ix(23)],
-      [from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) , from_ix(29) , split_spacer(2) , from_ix(30) , from_ix(31) , from_ix(32) , from_ix(33) , from_ix(34) , from_ix(35)],
-      [e           , e           , e           , e           , from_ix(36) , from_ix(37) , from_ix(38)     , from_ix(39) , from_ix(40) , e           , e            , e          , e]
-   ],
-  },
-];
 
 class AllDoneException {
   IsAllDone: boolean;
