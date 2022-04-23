@@ -16,7 +16,7 @@ export default function Home() {
           </Link>
         </p>
         <p>
-          <Link href="/zmk-layout-format/reviung">
+          <Link href="/zmk-layout-format/reviung41">
             <a>ZMK Layout format</a>
           </Link>
         </p>
