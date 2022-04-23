@@ -13,7 +13,7 @@ import {
   KeymapLayout,
 } from "code/layouts";
 import { LayoutLayer } from "code/layouts";
-import { parse_layouts_from_keymap_content } from "code/zmk";
+import { parse_layouts_from_keymap_content, print_keymaps } from "code/zmk";
 
 const sample_reviung_keymap = `
 keymap {
@@ -76,97 +76,6 @@ keymap {
   };
 };
   `;
-
-let pretty_labels = {};
-
-function keymap_code_replacements(key_label: string) {
-  return key_label;
-}
-
-function pretty_labels_replacements(key_label: string) {
-  if (pretty_labels[key_label]) return pretty_labels[key_label];
-
-  return key_label.replace("KC_", "");
-}
-
-let run_replacements = keymap_code_replacements;
-
-let base_indentation_level = 0;
-let indentation = "  ";
-function print_keymaps(
-  layers: LayoutLayer[],
-  board_layout: BoardLayout,
-  render_header_and_footer: boolean
-) {
-  let strBuilder = "";
-
-  function print(s: string, end = "\n") {
-    strBuilder += s + end;
-  }
-
-  const min_padding = 1;
-
-  const matrix_shape = [
-    board_layout.length,
-    Math.max(...board_layout.map((line) => line.length)),
-  ];
-
-  if (render_header_and_footer) print("keymap {");
-  layers.forEach((layer, i) => {
-    let matrix: string[][] = Array(matrix_shape[0])
-      .fill(null)
-      .map((_) => Array(matrix_shape[1]).fill(null));
-
-    board_layout.map((line_content, line_no) => {
-      line_content.map((col, col_no) => {
-        let key_label = col(layer.keys);
-        key_label = run_replacements(key_label);
-        matrix[line_no][col_no] = key_label;
-      });
-    });
-    print(`${indentation}${layer.name} {`);
-    print(`${indentation}${indentation}bindings = <`);
-
-    matrix.forEach((line, line_no) => {
-      print(`${indentation}${indentation}${indentation}`, "");
-      line.forEach((key, col_no) => {
-        let key_lengths = matrix
-          .map((l) => l[col_no])
-          .map((v) => (v || "").length);
-
-        const longest_key_definition_length =
-          Math.max(...key_lengths) + min_padding;
-
-        let right_padding = " ".repeat(
-          longest_key_definition_length - (key || "").length
-        );
-        let left_padding = " ";
-        // first column doesn't need padding because there's already whitespace
-        // at the start, with the indentation
-        if (col_no == 0) left_padding = "";
-
-        let suffix = " ";
-        if (!key || key.trim() == "") suffix = " ";
-
-        let last_col_with_key =
-          line
-            .map((c, i) => [(c || "").trim(), i])
-            .filter((c) => c[0] != "" || c[1] < col_no).length - 1;
-        let last_line = matrix.length - 1;
-        if (line_no == last_line && col_no == last_col_with_key) suffix = "";
-
-        print(`${left_padding}${key || ""}${right_padding}${suffix}`, "");
-      });
-      print(``);
-    });
-    print(`${indentation}${indentation}>;`);
-    print(`${indentation}};\n`);
-  });
-
-  if (render_header_and_footer) print("};");
-
-  return strBuilder;
-}
 
 interface LayoutFormatState {
   input_keymap_content: string;

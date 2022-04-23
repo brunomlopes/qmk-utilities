@@ -1,4 +1,7 @@
-import { parse_layouts_from_keymap_content } from "code/zmk";
+import { existing_layouts } from "code/layouts";
+import { parse_layouts_from_keymap_content, print_keymaps } from "code/zmk";
+
+let reviung41_layout = existing_layouts.find((l) => l.name == "Reviung41");
 
 describe(`ZMK Parser`, () => {
   it("Parses a reviung41 keymap with a single layer", () => {
@@ -53,7 +56,7 @@ describe(`ZMK Parser`, () => {
     // |    |  -  |  =  |  [  |  ]  |  \  |   | F1  | F2  | F3  | F4  | F5  | F6  |
     // |    | ESC | GUI | ALT | CAPS|  "  |   | F7  | F8  | F9  | F10 | F11 | F12 |
     //                       |     | ADJ | BKSP |    |     |
-      bindings = <
+    bindings = <
           &trans   &kp N1      &kp N2      &kp N3     &kp N4     &kp N5                &kp N6   &kp N7   &kp N8   &kp N9    &kp N0    &kp DEL  
           &trans   &kp MINUS   &kp EQUAL   &kp LBKT   &kp RBKT   &kp BSLH              &kp F1   &kp F2   &kp F3   &kp F4    &kp F5    &kp F6   
           &trans   &kp ESC     &kp LGUI    &kp RALT   &kp CLCK   &kp DQT               &kp F7   &kp F8   &kp F9   &kp F10   &kp F11   &kp F12  
@@ -68,5 +71,62 @@ describe(`ZMK Parser`, () => {
       "raise_layer",
     ]);
     expect(layouts.map((l) => l.keys.length)).toStrictEqual([41, 41]);
+  });
+});
+
+describe("ZMK Render", () => {
+  it("Renders two layouts correctly", () => {
+    let layouts = [
+      ...parse_layouts_from_keymap_content(`
+      
+            lower_layer {
+              bindings = <
+                &trans   &kp N1      &kp N2      &kp N3     &kp N4     &kp N5                &kp N6   &kp N7   &kp N8   &kp N9    &kp N0    &trans  
+                &trans   &kp EXCL    &kp AT        &kp HASH   &kp DLLR   &kp PRCNT             &kp CARET   &kp AMPS   &kp N8      &kp LPAR    &kp RPAR    &kp DEL
+                &trans   &kp MINUS   &kp KP_PLUS   &kp LBRC   &kp RBRC   &kp PIPE              &kp LEFT    &kp DOWN   &kp UP      &kp RIGHT   &kp GRAVE   &kp TILDE 
+                                                              &trans     &trans      &kp RET   &mo 3       &trans
+              >;
+                          };
+          
+                          raise_layer {
+          // -----------------------------------------------------------------------------------------
+          // |    |  1  |  2  |  3  |  4  |  5  |   |  6  |  7  |  8  |  9  |  0  | DEL |
+          // |    |  -  |  =  |  [  |  ]  |  \  |   | F1  | F2  | F3  | F4  | F5  | F6  |
+          // |    | ESC | GUI | ALT | CAPS|  "  |   | F7  | F8  | F9  | F10 | F11 | F12 |
+          //                       |     | ADJ | BKSP |    |     |
+          bindings = <
+                &trans   &kp N1      &kp N2      &kp N3     &kp N4     &kp N5                &kp N6   &kp N7   &kp N8   &kp N9    &kp N0    &kp DEL  
+                &trans   &kp MINUS   &kp EQUAL   &kp LBKT   &kp RBKT   &kp BSLH              &kp F1   &kp F2   &kp F3   &kp F4    &kp F5    &kp F6   
+                &trans   &kp ESC     &kp LGUI    &kp RALT   &kp CLCK   &kp DQT               &kp F7   &kp F8   &kp F9   &kp F10   &kp F11   &kp F12  
+                                                            &trans     &mo 3      &kp BSPC   &trans   &trans                                        
+              >;
+                          };
+              `),
+    ];
+
+    let rendered_layout = print_keymaps(
+      layouts,
+      reviung41_layout.keymap_layout,
+      false
+    );
+    expect(rendered_layout).toBe(`  lower_layer {
+    bindings = <
+      &trans   &kp N1      &kp N2        &kp N3     &kp N4     &kp N5                &kp N6      &kp N7     &kp N8   &kp N9      &kp N0      &trans     
+      &trans   &kp EXCL    &kp AT        &kp HASH   &kp DLLR   &kp PRCNT             &kp CARET   &kp AMPS   &kp N8   &kp LPAR    &kp RPAR    &kp DEL    
+      &trans   &kp MINUS   &kp KP_PLUS   &kp LBRC   &kp RBRC   &kp PIPE              &kp LEFT    &kp DOWN   &kp UP   &kp RIGHT   &kp GRAVE   &kp TILDE  
+                                                    &trans     &trans      &kp RET   &mo 3       &trans                                                
+    >;
+  };
+
+  raise_layer {
+    bindings = <
+      &trans   &kp N1      &kp N2      &kp N3     &kp N4     &kp N5                &kp N6   &kp N7   &kp N8   &kp N9    &kp N0    &kp DEL  
+      &trans   &kp MINUS   &kp EQUAL   &kp LBKT   &kp RBKT   &kp BSLH              &kp F1   &kp F2   &kp F3   &kp F4    &kp F5    &kp F6   
+      &trans   &kp ESC     &kp LGUI    &kp RALT   &kp CLCK   &kp DQT               &kp F7   &kp F8   &kp F9   &kp F10   &kp F11   &kp F12  
+                                                  &trans     &mo 3      &kp BSPC   &trans   &trans                                        
+    >;
+  };
+
+`);
   });
 });
