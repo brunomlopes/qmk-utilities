@@ -10,7 +10,11 @@ import {
   KeyboardConfiguration,
   LayoutLayer,
 } from "code/layouts";
-import { parse_layouts_from_keymap_content, print_keymaps_qmk } from "code/qmk";
+import {
+  parse_layouts_from_keymap_content,
+  print_ascii_keymap_qmk,
+  print_keymaps_qmk,
+} from "code/qmk";
 
 const sample_sofle_keymap = `
 const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
@@ -62,6 +66,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 interface LayoutFormatState {
   input_keymap_content: string;
   formatted_keymap_content: string;
+  formatted_ascii_keymap_content: string;
   selected_keyboard: KeyboardConfiguration;
 }
 interface LayoutFormatProps {
@@ -86,6 +91,7 @@ class LayoutFormatComponent extends Component<
     this.state = {
       input_keymap_content: "",
       formatted_keymap_content: "",
+      formatted_ascii_keymap_content: "",
       selected_keyboard: selected_keyboard,
     };
 
@@ -132,8 +138,14 @@ class LayoutFormatComponent extends Component<
       selected_keyboard.keymap_layout,
       render_header_and_footer
     );
+    let newAsciiLayouts = layouts
+      .map((layer) =>
+        print_ascii_keymap_qmk(layer, selected_keyboard.keymap_layout)
+      )
+      .join("\n");
     this.setState({
       formatted_keymap_content: newLayouts,
+      formatted_ascii_keymap_content: newAsciiLayouts,
     });
   }
 
@@ -194,6 +206,16 @@ class LayoutFormatComponent extends Component<
             id="formatted_keymap_output"
             readOnly={true}
             defaultValue={this.state.formatted_keymap_content}
+            className={styles.output_textarea}
+          ></textarea>
+        </div>
+        <h4>A rendered ascii keymap:</h4>
+        <div>
+          <textarea
+            name="formatted_ascii_keymap_output"
+            id="formatted_ascii_keymap_output"
+            readOnly={true}
+            defaultValue={this.state.formatted_ascii_keymap_content}
             className={styles.output_textarea}
           ></textarea>
         </div>

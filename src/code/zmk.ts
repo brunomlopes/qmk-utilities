@@ -1,5 +1,5 @@
 import { BoardLayout, LayoutLayer } from "./layouts";
-import { AllDoneException, print_keymaps } from "./parser";
+import { AllDoneException, print_ascii_keymap, print_keymaps } from "./parser";
 
 export function* parse_layouts_from_keymap_content(keymap_content: string) {
   const content_reader = (function* () {
@@ -77,4 +77,106 @@ export function print_keymaps_zmk(
     layer_line_prefix: (indentation, _) =>
       `${indentation}${indentation}${indentation}`,
   });
+}
+
+const pretty_print_mappings = {
+  EXCLAMATION: "!",
+  EXCL: "!",
+  AT_SIGN: "@",
+  AT: "@",
+  HASH: "#",
+  POUND: "#",
+  DOLLAR: "$",
+  DLLR: "$",
+  PERCENT: "%",
+  PRCNT: "%",
+  CARET: "^",
+  AMPERSAND: "&",
+  AMPS: "&",
+  ASTERISK: "*",
+  ASTRK: "*",
+  STAR: "*",
+  LEFT_PARENTHESIS: "(",
+  LPAR: "(",
+  RIGHT_PARENTHESIS: ")",
+  RPAR: ")",
+  MINUS: "-",
+  PLUS: "+",
+  EQUAL: "=",
+  LBKT: "[",
+  RBKT: "]",
+  LBRC: "{",
+  RBRC: "}",
+  PIPE: "|",
+  KP_PLUS: "#+",
+  TILDE: "~",
+  COMMA: ",",
+  DOT: ".",
+  BSLH: "\\",
+  RET: "⮠ ",
+  LGUI: "GUI",
+  RGUI: "GUI",
+  LALT: "ALT",
+  RALT: "ALT",
+  DQT: '"',
+  CLCK: "CAPS",
+  LEFT: "<-",
+  RIGHT: "->",
+  UP: "^",
+  DOWN: "v",
+};
+
+function ascii_print_key(
+  key: string,
+  layer: LayoutLayer,
+  position: { line: number; column: number },
+  layers: LayoutLayer[]
+) {
+  if (!key) return key;
+  if (key.startsWith("&kp ")) {
+    let p = key.replace("&kp ", "");
+    if (p.match(/N\d$/)) return p.replace("N", "");
+    if (pretty_print_mappings[p]) return pretty_print_mappings[p];
+    return p;
+  }
+  if (key.startsWith("&mo ")) {
+    return key.replace("&mo", "[m]");
+  }
+  if (key.startsWith("&tog")) {
+    return key.replace("&tog", "[t]");
+  }
+  if (key.startsWith("&rgb_ug")) {
+    return key.replace("&rgb_ug", "rgb").replace("RGB_", "");
+  }
+  if (key.startsWith("&bt")) {
+    return key.replace("&bt", "bt").replace("BT_", "");
+  }
+  if (key == "&none") return "[X]";
+  if (key.startsWith("&mt")) {
+    return key
+      .replace("&mt ", "")
+      .split(" ")
+      .map((w) => ascii_print_key(w, layer, position, layers))
+      .join("|");
+  }
+  if (key == "&trans") return " ";
+  return key;
+}
+
+export function print_ascii_keymap_zmk(
+  layers: LayoutLayer,
+  board_layout: BoardLayout
+) {
+  return print_ascii_keymap(
+    [layers],
+    board_layout,
+    false,
+    {
+      separator: "|",
+      layer_prefix_render: (indentation, layer) => ``,
+      layer_sufix_render: (indentation, layer) => `\n`,
+      layer_line_prefix: (indentation, _) => `${indentation}${indentation}// `,
+    },
+    ascii_print_key
+  );
 }

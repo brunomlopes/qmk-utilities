@@ -1,7 +1,18 @@
-import { existing_layouts } from "code/layouts";
-import { parse_layouts_from_keymap_content, print_keymaps_zmk } from "code/zmk";
+import { existing_layouts, straight_keymap } from "code/layouts";
+import {
+  parse_layouts_from_keymap_content,
+  print_ascii_keymap_zmk,
+  print_keymaps_zmk,
+} from "code/zmk";
+import { debug } from "console";
 
 let reviung41_layout = existing_layouts.find((l) => l.name == "Reviung41");
+
+let two_by_two_layout = {
+  name: "two_by_two",
+  keymap_layout: straight_keymap(2, 2),
+  keymap_layout_markers: ["LAYOUT("],
+};
 
 describe(`ZMK Parser`, () => {
   it("Parses a reviung41 keymap with a single layer", () => {
@@ -128,5 +139,91 @@ describe("ZMK Render", () => {
   };
 
 `);
+  });
+
+  it("Render an ascii layout", () => {
+    let layouts = [
+      ...parse_layouts_from_keymap_content(`
+                            raise_layer {
+            // -----------------------------------------------------------------------------------------
+            // |   |  1  |  2  |  3  |  4  |  5  |   |  6  |  7  |  8  |  9  |  0  | DEL |
+            // |   |  -  |  =  |  [  |  ]  |  \  |   | F1  | F2  | F3  | F4  | F5  | F6  |
+            // |   | ESC | GUI | ALT | CAPS|  "  |   | F7  | F8  | F9  | F10 | F11 | F12 |
+            // |                     |     | ADJ | BKSP |    |     |
+            bindings = <
+                  &trans   &kp N1      &kp N2      &kp N3     &kp N4     &kp N5                &kp N6   &kp N7   &kp N8   &kp N9    &kp N0    &kp DEL
+                  &trans   &kp MINUS   &kp EQUAL   &kp LBKT   &kp RBKT   &kp BSLH              &kp F1   &kp F2   &kp F3   &kp F4    &kp F5    &kp F6
+                  &trans   &kp ESC     &kp LGUI    &kp RALT   &kp CLCK   &kp DQT               &kp F7   &kp F8   &kp F9   &kp F10   &kp F11   &kp F12
+                                                              &trans     &mo 3      &kp BSPC   &trans   &trans
+                >;
+                            };
+                `),
+    ];
+    let rendered_layout = print_ascii_keymap_zmk(
+      layouts[0],
+      reviung41_layout.keymap_layout
+    );
+    // prettier-ignore
+    expect(rendered_layout).toBe(
+`    // |   |  1  |  2  |  3  |  4   |   5   |      | 6  | 7  | 8  |  9  |  0  | DEL |
+    // |   |  -  |  =  |  [  |  ]   |   \\   |      | F1 | F2 | F3 | F4  | F5  | F6  |
+    // |   | ESC | GUI | ALT | CAPS |   "   |      | F7 | F8 | F9 | F10 | F11 | F12 |
+    //                       |      | [m] 3 | BSPC |    |    |                       
+
+
+`
+    );
+  });
+
+  it("When length is even, other keys have extra space on the right", () => {
+    let layouts = [
+      ...parse_layouts_from_keymap_content(`
+                          layer {
+          
+          bindings = <
+                &kp A      &kp CLCK
+                &kp CLCK   &kp N1     
+              >;
+                          };
+              `),
+    ];
+    let rendered_layout = print_ascii_keymap_zmk(
+      layouts[0],
+      two_by_two_layout.keymap_layout
+    );
+    // prettier-ignore
+    expect(rendered_layout).toBe(
+`    // |  A   | CAPS |
+    // | CAPS |  1   |
+
+
+`
+    );
+  });
+
+  it("Renders specific behaviours better", () => {
+    let layouts = [
+      ...parse_layouts_from_keymap_content(`
+                          layer {
+          
+          bindings = <
+                &mt LALT ESC      &mo 2
+                &kp CLCK          &kp N1     
+              >;
+                          };
+              `),
+    ];
+    let rendered_layout = print_ascii_keymap_zmk(
+      layouts[0],
+      two_by_two_layout.keymap_layout
+    );
+    // prettier-ignore
+    expect(rendered_layout).toBe(
+`    // | LALT|ESC | [m] 2 |
+    // |   CAPS   |   1   |
+
+
+`
+    );
   });
 });

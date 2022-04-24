@@ -24,7 +24,7 @@ function e(_: string[]) {
  * @param rows number of rows on the keymap
  * @returns
  */
-function straight_keymap(cols: number, rows: number): BoardLayout {
+export function straight_keymap(cols: number, rows: number): BoardLayout {
   return Array(rows)
     .fill(null)
     .map((_, line_no) =>
