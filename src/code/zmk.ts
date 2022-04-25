@@ -35,6 +35,9 @@ export function* parse_layouts_from_keymap_content(keymap_content: string) {
         lines.push(line);
         line = read_line();
       }
+      if (lines.filter((l) => l.match(/\s*\/\//)).length > 0)
+        layoutLayer.includeAsciiKeymap = true;
+
       layoutLayer.keys = lines
         .map((l) => l.trim())
         .filter(
@@ -71,8 +74,13 @@ export function print_keymaps_zmk(
 ) {
   return print_keymaps(layers, board_layout, render_header_and_footer, {
     separator: " ",
-    layer_prefix_render: (indentation, layer) =>
-      `${indentation}${layer.name} {\n${indentation}${indentation}bindings = <`,
+    layer_prefix_render: (indentation, layer) => {
+      let ascii_keymap = "";
+      if (layer.includeAsciiKeymap) {
+        ascii_keymap = print_ascii_keymap_zmk(layer, board_layout) + "\n";
+      }
+      return `${indentation}${layer.name} {\n${ascii_keymap}${indentation}${indentation}bindings = <`;
+    },
     layer_sufix_render: (indentation, layer) =>
       `${indentation}${indentation}>;\n${indentation}};\n`,
     layer_line_prefix: (indentation, _) =>
@@ -124,7 +132,6 @@ export function print_ascii_keymap_zmk(
   return print_ascii_keymap(
     [layers],
     board_layout,
-    false,
     {
       separator: "|",
       layer_prefix_render: (indentation, layer) => ``,

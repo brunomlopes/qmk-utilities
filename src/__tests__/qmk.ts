@@ -116,6 +116,7 @@ describe("QMK Render", () => {
                         KC_LGUI , KC_LALT , KC_LCTL , _______ , KC_ENT  ,    KC_SPC , _______ , KC_RCTL , KC_RALT , KC_RGUI
     ),
     [_LOWER] = LAYOUT(
+      // insert keymap here
       KC_DEL  , KC_F1   , KC_F2   , KC_F3   , KC_F4   , KC_F5   ,                        KC_F6       , KC_F7   , KC_F8      , KC_F9   , KC_F10  , KC_F11  ,
       KC_GRV  , KC_1    , KC_2    , KC_3    , KC_4    , KC_5    ,                        KC_6        , KC_7    , KC_8       , KC_9    , KC_0    , KC_F12  ,
       KC_TILD , KC_EXLM , KC_AT   , KC_HASH , KC_DLR  , KC_PERC ,                        KC_CIRC     , KC_AMPR , KC_ASTR    , KC_LPRN , KC_RPRN , KC_PIPE ,
@@ -140,6 +141,12 @@ describe("QMK Render", () => {
   ),
 
   [_LOWER] = LAYOUT(
+    // |   DEL   | F1 |   F2    |   F3    |   F4    |   F5              |              |     F6      |   F7    |   F8    |   F9    | F10 |   F11   |
+    // |    \`    | 1  |    2    |    3    |    4    |    5              |              |      6      |    7    |    8    |    9    |  0  |   F12   |
+    // |    ~    | !  |    @    |    #    |    $    |    %              |              |    CIRC     |    &    |  ASTR   |    (    |  )  |    |    |
+    // | _______ | _  |    -    |   NO    |  LCBR   |    {    | _______ |    | _______ |      \\      |    )    |  S(\\)   |   NO    | NO  | _______ |
+    //                | _______ | _______ | _______ | _______ | _______ |    | _______ | TT(_NUMPAD) | _______ | _______ | _______ |                
+
     KC_DEL  , KC_F1   , KC_F2   , KC_F3   , KC_F4   , KC_F5   ,                          KC_F6       , KC_F7   , KC_F8      , KC_F9   , KC_F10  , KC_F11  ,
     KC_GRV  , KC_1    , KC_2    , KC_3    , KC_4    , KC_5    ,                          KC_6        , KC_7    , KC_8       , KC_9    , KC_0    , KC_F12  ,
     KC_TILD , KC_EXLM , KC_AT   , KC_HASH , KC_DLR  , KC_PERC ,                          KC_CIRC     , KC_AMPR , KC_ASTR    , KC_LPRN , KC_RPRN , KC_PIPE ,
@@ -167,8 +174,6 @@ describe("QMK Render", () => {
     expect(rendered_layout).toBe(
       `    // | C(C) | A(F4) |
     // | S(\\) |   Q   |
-
-
 `
     );
   });

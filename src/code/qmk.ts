@@ -2,6 +2,8 @@ import { pretty_print_mappings } from "./keycodes";
 import { BoardLayout, LayoutLayer } from "./layouts";
 import { AllDoneException, print_ascii_keymap, print_keymaps } from "./parser";
 
+const is_line_comment_re = /\s*\/\//;
+
 export function* parse_layouts_from_keymap_content(
   keymap_content: string,
   layout_definition_start_marker: string[]
@@ -40,8 +42,10 @@ export function* parse_layouts_from_keymap_content(
         lines.push(line);
         line = read_line();
       }
+      if (lines.filter((l) => l.match(is_line_comment_re)).length > 0)
+        layoutLayer.includeAsciiKeymap = true;
       layoutLayer.keys = lines
-        .filter((l) => l.trim() != ")")
+        .filter((l) => l.trim() != ")" && !l.match(is_line_comment_re))
         .map((l) => l.trim().replace(/\\$/, ""))
         .join("")
         .split(/[,](?!\s*\w+\))/)
@@ -62,8 +66,13 @@ export function print_keymaps_qmk(
 ) {
   return print_keymaps(layers, board_layout, render_header_and_footer, {
     separator: ",",
-    layer_prefix_render: (indentation, layer) =>
-      `${indentation}[${layer.name}] = ${layer.layout_function}`,
+    layer_prefix_render: (indentation, layer) => {
+      let ascii_keymap = "";
+      if (layer.includeAsciiKeymap) {
+        ascii_keymap = `\n${print_ascii_keymap_qmk(layer, board_layout)}`;
+      }
+      return `${indentation}[${layer.name}] = ${layer.layout_function}${ascii_keymap}`;
+    },
     layer_sufix_render: (indentation, _) => `${indentation}),\n`,
     layer_line_prefix: (indentation, _) => `${indentation}${indentation}`,
   });
@@ -114,7 +123,6 @@ export function print_ascii_keymap_qmk(
   return print_ascii_keymap(
     [layers],
     board_layout,
-    false,
     {
       separator: "|",
       layer_prefix_render: (indentation, layer) => ``,

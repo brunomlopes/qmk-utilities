@@ -6,6 +6,7 @@ export class LayoutLayer {
   name: string;
   layout_function: string;
   keys: KeymapLayout;
+  includeAsciiKeymap: boolean = false;
 }
 
 function from_ix(ix: number) {

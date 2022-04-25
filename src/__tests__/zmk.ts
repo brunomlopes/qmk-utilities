@@ -129,6 +129,11 @@ describe("ZMK Render", () => {
   };
 
   raise_layer {
+    // |   |  1  |  2  |  3  |  4   |   5   |      | 6  | 7  | 8  |  9  |  0  | DEL |
+    // |   |  -  |  =  |  [  |  ]   |   \\   |      | F1 | F2 | F3 | F4  | F5  | F6  |
+    // |   | ESC | GUI | ALT | CAPS |   "   |      | F7 | F8 | F9 | F10 | F11 | F12 |
+    //                       |      | [m] 3 | BSPC |    |    |                       
+
     bindings = <
       &trans   &kp N1      &kp N2      &kp N3     &kp N4     &kp N5                &kp N6   &kp N7   &kp N8   &kp N9    &kp N0    &kp DEL  
       &trans   &kp MINUS   &kp EQUAL   &kp LBKT   &kp RBKT   &kp BSLH              &kp F1   &kp F2   &kp F3   &kp F4    &kp F5    &kp F6   
@@ -140,6 +145,42 @@ describe("ZMK Render", () => {
 `);
   });
 
+  it("When there are comments in the middle of the layer, insert the ascii keymap", () => {
+    let layouts = [
+      ...parse_layouts_from_keymap_content(`
+                          layer {
+          // mapping here
+          bindings = <
+                &kp A      &kp CLCK
+                &kp CLCK   &kp N1     
+              >;
+                          };
+              `),
+    ];
+    let rendered_layout = print_keymaps_zmk(
+      layouts,
+      two_by_two_layout.keymap_layout,
+      false
+    );
+    // prettier-ignore
+    expect(rendered_layout).toBe(
+
+`  layer {
+    // |  A   | CAPS |
+    // | CAPS |  1   |
+
+    bindings = <
+      &kp A      &kp CLCK  
+      &kp CLCK   &kp N1   
+    >;
+  };
+
+`
+    );
+  });
+});
+
+describe("ZMK ascii render", () => {
   it("Render an ascii layout", () => {
     let layouts = [
       ...parse_layouts_from_keymap_content(`
@@ -168,8 +209,6 @@ describe("ZMK Render", () => {
     // |   |  -  |  =  |  [  |  ]   |   \\   |      | F1 | F2 | F3 | F4  | F5  | F6  |
     // |   | ESC | GUI | ALT | CAPS |   "   |      | F7 | F8 | F9 | F10 | F11 | F12 |
     //                       |      | [m] 3 | BSPC |    |    |                       
-
-
 `
     );
   });
@@ -178,7 +217,6 @@ describe("ZMK Render", () => {
     let layouts = [
       ...parse_layouts_from_keymap_content(`
                           layer {
-          
           bindings = <
                 &kp A      &kp CLCK
                 &kp CLCK   &kp N1     
@@ -194,8 +232,6 @@ describe("ZMK Render", () => {
     expect(rendered_layout).toBe(
 `    // |  A   | CAPS |
     // | CAPS |  1   |
-
-
 `
     );
   });
@@ -204,7 +240,6 @@ describe("ZMK Render", () => {
     let layouts = [
       ...parse_layouts_from_keymap_content(`
                           layer {
-          
           bindings = <
                 &mt LALT ESC      &mo 2
                 &kp CLCK          &kp N1     
@@ -220,8 +255,6 @@ describe("ZMK Render", () => {
     expect(rendered_layout).toBe(
 `    // | LALT|ESC | [m] 2 |
     // |   CAPS   |   1   |
-
-
 `
     );
   });

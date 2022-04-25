@@ -126,7 +126,6 @@ export function print_keymaps(
 export function print_ascii_keymap(
   layers: LayoutLayer[],
   board_layout: BoardLayout,
-  render_header_and_footer: boolean,
   print_configuration: PrintConfiguration,
   key_replacer: (
     key: string,
@@ -220,7 +219,6 @@ export function print_ascii_keymap(
           line
             .map((c, i) => [(c || "").trim(), i])
             .filter((c) => c[0] != "" || c[1] < col_no).length - 1;
-        let last_line = matrix.length - 1;
         if (col_no == last_col_with_key) suffix = "|";
 
         print(
@@ -232,10 +230,7 @@ export function print_ascii_keymap(
       });
       print("");
     });
-    print(print_configuration.layer_sufix_render(indentation, layer));
   });
-
-  if (render_header_and_footer) print("};");
 
   return strBuilder;
 }
