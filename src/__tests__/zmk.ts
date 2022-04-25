@@ -4,7 +4,6 @@ import {
   print_ascii_keymap_zmk,
   print_keymaps_zmk,
 } from "code/zmk";
-import { debug } from "console";
 
 let reviung41_layout = existing_layouts.find((l) => l.name == "Reviung41");
 

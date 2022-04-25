@@ -1,3 +1,4 @@
+import { pretty_print_mappings } from "./keycodes";
 import { BoardLayout, LayoutLayer } from "./layouts";
 import { AllDoneException, print_ascii_keymap, print_keymaps } from "./parser";
 
@@ -78,53 +79,6 @@ export function print_keymaps_zmk(
       `${indentation}${indentation}${indentation}`,
   });
 }
-
-const pretty_print_mappings = {
-  EXCLAMATION: "!",
-  EXCL: "!",
-  AT_SIGN: "@",
-  AT: "@",
-  HASH: "#",
-  POUND: "#",
-  DOLLAR: "$",
-  DLLR: "$",
-  PERCENT: "%",
-  PRCNT: "%",
-  CARET: "^",
-  AMPERSAND: "&",
-  AMPS: "&",
-  ASTERISK: "*",
-  ASTRK: "*",
-  STAR: "*",
-  LEFT_PARENTHESIS: "(",
-  LPAR: "(",
-  RIGHT_PARENTHESIS: ")",
-  RPAR: ")",
-  MINUS: "-",
-  PLUS: "+",
-  EQUAL: "=",
-  LBKT: "[",
-  RBKT: "]",
-  LBRC: "{",
-  RBRC: "}",
-  PIPE: "|",
-  KP_PLUS: "#+",
-  TILDE: "~",
-  COMMA: ",",
-  DOT: ".",
-  BSLH: "\\",
-  RET: "⮠ ",
-  LGUI: "GUI",
-  RGUI: "GUI",
-  LALT: "ALT",
-  RALT: "ALT",
-  DQT: '"',
-  CLCK: "CAPS",
-  LEFT: "<-",
-  RIGHT: "->",
-  UP: "^",
-  DOWN: "v",
-};
 
 function ascii_print_key(
   key: string,

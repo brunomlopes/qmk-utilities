@@ -1,3 +1,4 @@
+import { pretty_print_mappings } from "./keycodes";
 import { BoardLayout, LayoutLayer } from "./layouts";
 import { AllDoneException, print_ascii_keymap, print_keymaps } from "./parser";
 
@@ -68,62 +69,6 @@ export function print_keymaps_qmk(
   });
 }
 
-const pretty_print_mappings = {
-  EXCLAMATION: "!",
-  EXCL: "!",
-  AT_SIGN: "@",
-  AT: "@",
-  HASH: "#",
-  POUND: "#",
-  DOLLAR: "$",
-  DLLR: "$",
-  PERCENT: "%",
-  PRCNT: "%",
-  CARET: "^",
-  AMPERSAND: "&",
-  AMPS: "&",
-  ASTERISK: "*",
-  ASTRK: "*",
-  STAR: "*",
-  LEFT_PARENTHESIS: "(",
-  LPAR: "(",
-  RIGHT_PARENTHESIS: ")",
-  RPAR: ")",
-  MINUS: "-",
-  PLUS: "+",
-  EQUAL: "=",
-  LBKT: "[",
-  RBKT: "]",
-  LBRC: "{",
-  RBRC: "}",
-  PIPE: "|",
-  KP_PLUS: "#+",
-  TILDE: "~",
-  COMMA: ",",
-  DOT: ".",
-  BSLH: "\\",
-  RET: "⮠ ",
-  LGUI: "GUI",
-  RGUI: "GUI",
-  LALT: "ALT",
-  RALT: "ALT",
-  DQT: '"',
-  CLCK: "CAPS",
-  LEFT: "<-",
-  RIGHT: "->",
-  UP: "^",
-  DOWN: "v",
-
-  MINS: "-",
-  TILD: "~",
-  COMM: ",",
-  LPRN: "(",
-  RPRN: ")",
-  AMPR: "&",
-  EXLM: "!",
-  UNDS: "_",
-};
-
 function ascii_print_key(
   key: string,
   layer: LayoutLayer,
@@ -135,22 +80,19 @@ function ascii_print_key(
   if (key.startsWith("KC_")) {
     let p = key.replace("KC_", "");
     if (pretty_print_mappings[p]) return pretty_print_mappings[p];
+
+    if (p.match(/P\d/)) return p.replace("P", "#");
+
     return p;
   }
+  const mod_regexp = /(\w+)\(([\w_]+)\)/;
+  let mod_regexp_match = key.match(mod_regexp);
+  if (mod_regexp_match) {
+    let mod = mod_regexp_match[1];
+    let shifted = mod_regexp_match[2];
+    return `${mod}(${ascii_print_key(shifted, layer, position, layers)})`;
+  }
 
-  if (key.startsWith("&mo ")) {
-    return key.replace("&mo", "[m]");
-  }
-  if (key.startsWith("&tog")) {
-    return key.replace("&tog", "[t]");
-  }
-  if (key.startsWith("&rgb_ug")) {
-    return key.replace("&rgb_ug", "rgb").replace("RGB_", "");
-  }
-  if (key.startsWith("&bt")) {
-    return key.replace("&bt", "bt").replace("BT_", "");
-  }
-  if (key == "&none") return "[X]";
   if (key.startsWith("MT(")) {
     return key
       .replace("MT(", "")

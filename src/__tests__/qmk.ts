@@ -1,7 +1,17 @@
-import { existing_layouts } from "code/layouts";
-import { parse_layouts_from_keymap_content, print_keymaps_qmk } from "code/qmk";
+import { existing_layouts, straight_keymap } from "code/layouts";
+import {
+  parse_layouts_from_keymap_content,
+  print_ascii_keymap_qmk,
+  print_keymaps_qmk,
+} from "code/qmk";
 
 const sofle_layout = existing_layouts.find((l) => l.name == "Sofle");
+
+let two_by_two_layout = {
+  name: "two_by_two",
+  keymap_layout: straight_keymap(2, 2),
+  keymap_layout_markers: ["LAYOUT("],
+};
 
 describe(`QMK Parser`, () => {
   it("Parses a sofle keymap with a single layer", () => {
@@ -138,5 +148,28 @@ describe("QMK Render", () => {
   ),
 
 `);
+  });
+  it("Renders two layouts correctly", () => {
+    let layouts = [
+      ...parse_layouts_from_keymap_content(
+        `  [_LAYER] = LAYOUT(
+          C(KC_C)  , A(KC_F4)  ,
+          S(KC_NUBS)  , KC_Q ,
+      ),
+    `,
+        two_by_two_layout.keymap_layout_markers
+      ),
+    ];
+    let rendered_layout = print_ascii_keymap_qmk(
+      layouts[0],
+      two_by_two_layout.keymap_layout
+    );
+    expect(rendered_layout).toBe(
+      `    // | C(C) | A(F4) |
+    // | S(\\) |   Q   |
+
+
+`
+    );
   });
 });

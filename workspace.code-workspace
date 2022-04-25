@@ -24,5 +24,28 @@
 				"priority": 4
 			}
 		]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "Debug Jest Tests",
+        "type": "node",
+        "request": "launch",
+        "runtimeArgs": [
+          "--inspect-brk",
+          "${workspaceRoot}/src/node_modules/jest/bin/jest.js",
+          "--runInBand"
+        ],
+        "console": "integratedTerminal",
+        "internalConsoleOptions": "neverOpen",
+        "port": 9229,
+        "cwd": "${workspaceRoot}\\src",
+        "runtimeExecutable": "${workspaceRoot}\\local\\node\\node",
+        "env": {
+          "PATH": "${workspaceRoot}\\local\\node\\;${env:PATH}"
+        }
+      }
+    ]
 	}
 }
