@@ -174,9 +174,9 @@ class LayoutFormatComponent extends Component<
 
   render() {
     return (
-      <Layout home="false">
+      <Layout home={false}>
         <Head>
-          <title>Layout formatter</title>
+          <title>ZMK Layout formatter</title>
         </Head>
         <h1>Formats zmk layouts</h1>
         <div>

@@ -11,12 +11,12 @@ export default function Home() {
       </Head>
       <section className={utilStyles.headingMd}>
         <p>
-          <Link href="/layout-format/Sofle">
+          <Link href="/qmk-layout-format/Sofle">
             <a>QMK Layout format</a>
           </Link>
         </p>
         <p>
-          <Link href="/zmk-layout-format/reviung41">
+          <Link href="/zmk-layout-format/Reviung41">
             <a>ZMK Layout format</a>
           </Link>
         </p>
