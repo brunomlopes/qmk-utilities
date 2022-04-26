@@ -258,4 +258,34 @@ describe("ZMK ascii render", () => {
 `
     );
   });
+  it("Renders rgb and bt aliases correctly", () => {
+    let layouts = [
+      ...parse_layouts_from_keymap_content(
+        `                adjust_layer {
+                // -----------------------------------------------------------------------------------------
+                // | RGB BRI+ | RGB SAT+ | RGB HUE+ | RGB ANI+ |    | RGB TOG |   |  BT1  | BT2 | BT3 | BT4 | BT5 | BT CLR |
+                // | RGB BRI- | RGB SAT- | RGB HUE- | RGB ANI- |    |         |   |       |     |     |     |     |        |
+                // |          |          |          |          |    |         |   | RESET |     |     |     |     |        |
+                //                                              |     |     |     |     |     |
+                    bindings = <
+                      &rgb_ug RGB_BRI   &rgb_ug RGB_SAI   &rgb_ug RGB_HUI   &rgb_ug RGB_EFF   &none    &rgb_ug RGB_TOG            &bt BT_SEL 0   &bt BT_SEL 1   &bt BT_SEL 2   &bt BT_SEL 3   &bt BT_SEL 4   &bt BT_CLR  
+                      &rgb_ug RGB_BRD   &rgb_ug RGB_SAD   &rgb_ug RGB_HUD   &rgb_ug RGB_EFR   &none    &none                      &none          &none          &none          &none          &none          &none       
+                      &none             &none             &none             &none             &none    &none                      &reset         &none          &none          &none          &none          &none       
+                                                                                              &trans   &trans            &tog 3   &trans         &trans                                                                 
+                    >; 
+                  };`
+      ),
+    ];
+    let rendered_layout = print_ascii_keymap_zmk(
+      layouts[0],
+      reviung41_layout.keymap_layout
+    );
+    expect(rendered_layout).toBe(
+      `    // | rgb BRI+ | rgb SAT+ | rgb HUE+ | rgb ANI+ | [X] | rgb TOG |       | bt SEL 0 | bt SEL 1 | bt SEL 2 | bt SEL 3 | bt SEL 4 | bt CLR |
+    // | rgb BRI- | rgb SAT- | rgb HUE- | rgb ANI- | [X] |   [X]   |       |   [X]    |   [X]    |   [X]    |   [X]    |   [X]    |  [X]   |
+    // |   [X]    |   [X]    |   [X]    |   [X]    | [X] |   [X]   |       |  &reset  |   [X]    |   [X]    |   [X]    |   [X]    |  [X]   |
+    //                                             |     |         | [t] 3 |          |          |                                          
+`
+    );
+  });
 });

@@ -108,7 +108,15 @@ function ascii_print_key(
     return key.replace("&tog", "[t]");
   }
   if (key.startsWith("&rgb_ug")) {
-    return key.replace("&rgb_ug", "rgb").replace("RGB_", "");
+    key = key.replace("&rgb_ug", "rgb").replace("RGB_", "");
+    key = key.replace(/I$/, "+").replace(/D$/, "-");
+    key = key.replace(/F$/, "+").replace(/R$/, "-");
+    key = key
+      .replace("BR", "BRI")
+      .replace("SA", "SAT")
+      .replace("HU", "HUE")
+      .replace("EF", "ANI");
+    return key;
   }
   if (key.startsWith("&bt")) {
     return key.replace("&bt", "bt").replace("BT_", "");
