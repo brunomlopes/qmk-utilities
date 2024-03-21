@@ -221,9 +221,7 @@ class LayoutFormatComponent extends Component<
           ></textarea>
         </div>
         <h2>
-          <Link href="/">
-            <a>Back home</a>
-          </Link>
+          <Link href="/">Back home</Link>
         </h2>
       </Layout>
     );
