@@ -84,7 +84,7 @@ function ascii_print_key(
   position: { line: number; column: number },
   layers: LayoutLayer[]
 ) {
-  if (!key) return key;
+  if (!key) return "";
 
   if (key.startsWith("KC_")) {
     let p = key.replace("KC_", "");
