@@ -10,7 +10,10 @@ export class LayoutLayer {
 }
 
 function from_ix(ix: number) {
-  return (layout: string[]) => layout[ix];
+  return (layout: string[]) => {
+    if (ix >= layout.length) throw new Error(`Layout index ${ix} out of bounds (layout has ${layout.length} keys)`);
+    return layout[ix]
+  };
 }
 function split_spacer(n: number) {
   return (_: string[]) => " ".repeat(n);
@@ -116,6 +119,18 @@ export const existing_layouts: KeyboardConfiguration[] = [
         [e           , e           , e           , e           , from_ix(36) , from_ix(37) , from_ix(38)     , from_ix(39) , from_ix(40) , e           , e            , e          , e]
      ],
     keymap_layout_markers: ["LAYOUT(", "LAYOUT_wrapper(", "LAYOUT_reviung41("],
+  },
+  {
+    name: "Rev57lp",
+    // prettier-ignore
+    keymap_layout:[
+        [from_ix(0)  , from_ix(1)  , from_ix(2)  , from_ix(3)  , from_ix(4)  , from_ix(5)  , e ,           e ,           e , from_ix(6)  , from_ix(7)  , from_ix(8)  , from_ix(9)  , from_ix(10) , from_ix(11)],
+        [from_ix(12) , from_ix(13) , from_ix(14) , from_ix(15) , from_ix(16) , from_ix(17) , e ,           e ,           e , from_ix(18) , from_ix(19) , from_ix(20) , from_ix(21) , from_ix(22) , from_ix(23)],
+        [from_ix(24) , from_ix(25) , from_ix(26) , from_ix(27) , from_ix(28) , from_ix(29) , e ,       from_ix(30) ,     e , from_ix(31) , from_ix(32) , from_ix(33) , from_ix(34) , from_ix(35) , from_ix(36)],
+        [from_ix(37) , from_ix(38) , from_ix(39) , from_ix(40) , from_ix(41) , from_ix(42) , e ,           e ,           e , from_ix(43) , from_ix(44) , from_ix(45) , from_ix(46) , from_ix(47) , from_ix(48)],
+        [e           , e           , e           , from_ix(49) , from_ix(50) , from_ix(51) , from_ix(52) , e , from_ix(53) , from_ix(54),  from_ix(55) , from_ix(56) , e           , e          , e]
+     ],
+    keymap_layout_markers: ["LAYOUT(", "LAYOUT_wrapper("],
   },
   {
     name: "Cantor, Piantor",
